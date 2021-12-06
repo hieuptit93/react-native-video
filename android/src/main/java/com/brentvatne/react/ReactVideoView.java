@@ -402,7 +402,7 @@ public class ReactVideoView extends ScalableVideoView implements
             if (!mMediaPlayer.isPlaying()) {
                 start();
                 // Setting the rate unpauses, so we have to wait for an unpause
-                if (mRate != mActiveRate) { 
+                if (mRate != mActiveRate) {
                     setRateModifier(mRate);
                 }
 
@@ -633,11 +633,15 @@ public class ReactVideoView extends ScalableVideoView implements
         mSeekTime = 0;
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     public void seekTo(int msec) {
         if (mMediaPlayerValid) {
             mSeekTime = msec;
-            super.mMediaPlayer.seekTo(msec, MediaPlayer.SEEK_CLOSEST);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                super.mMediaPlayer.seekTo(msec, MediaPlayer.SEEK_CLOSEST);
+            else
+                super.mMediaPlayer.seekTo((int)msec);
             if (isCompleted && mVideoDuration != 0 && msec < mVideoDuration) {
                 isCompleted = false;
             }
@@ -677,7 +681,7 @@ public class ReactVideoView extends ScalableVideoView implements
             setKeepScreenOn(false);
         }
     }
-        
+
     // This is not fully tested and does not work for all forms of timed metadata
     @TargetApi(23) // 6.0
     public class TimedMetaDataAvailableListener
@@ -777,7 +781,7 @@ public class ReactVideoView extends ScalableVideoView implements
 
         return result;
     }
-        
+
     // Select track (so we can use it to listen to timed meta data updates)
     private void selectTimedMetadataTrack(MediaPlayer mp) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
